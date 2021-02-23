@@ -6,12 +6,12 @@ rm(list=ls())
 #set wd: 
 setwd("C:/Users/lse043/OneDrive - University of Bergen/Documents/0 PhD PROJECT/PAPER 2 'Strategies'/Ghana_RTI_media_advocacy")
 
-# 1. Importing data ####
+# 1. Importing (old) data ####
 
 #(1) webscraped news stories and (2) press statements
 
 #reading from previous 
-load("C:/Users/lse043/OneDrive - University of Bergen/Documents/0 PhD PROJECT/PAPER 2 'Strategies'/ANALYSIS/1 Getting data/.RData")
+#load("C:/Users/lse043/OneDrive - University of Bergen/Documents/0 PhD PROJECT/PAPER 2 'Strategies'/ANALYSIS/1 Getting data/.RData")
 # Save the entire workspace anew:
 #save.image(file = "old_import.RData")
 
@@ -142,17 +142,95 @@ tail(df, 2)
 #unique docnames for corpus function: 
 df$id <- 1:nrow(df)
 
-# saving ####
+# Saving new data ####
 save(df_gw, text, df, file = "dataframes.RData")
 # loading: 
-#load("dataframes.RData")
+load("dataframes.RData")
 
 saveRDS(df, "dataframe_merged.rds")
 # Restore it
-#df <- readRDS("dataframe_merged.rds")
+df <- readRDS("dataframe_merged.rds")
 
 ## empty memory (!)
-rm(list=ls())
+#rm(list=ls())
 
 
+# 3. adding grouping variables ####
+library(lubridate)
+# by year
+str(df$date)
+df$group_year <- format(df$date, format="%Y")
+str(df$group_year)
+df$group_year
 
+# by press statement
+df$group_ps <- df$date
+
+
+library(dplyr)
+#df$group_ps <- as.POSIXct(df$date, format = "%m/%d/%Y %H:%M")
+# this is needed in order to use the correct date format
+df$group_ps <- df$date
+df$group_ps
+str(df$group_ps)
+
+#to get press statement dates
+str(text$date)
+text$date
+
+df <- df %>% 
+  mutate(v1 = ifelse(group_ps >= "2010-02-15 01:00:00" & group_ps < "2012-05-10 01:00:00", 1, 0),
+         v2 = ifelse(group_ps >= "2012-05-10 01:00:00" & group_ps < "2012-05-22 01:00:00", 1, 0),
+         v3 = ifelse(group_ps >= "2012-05-22 01:00:00" & group_ps < "2012-07-19 01:00:00", 1, 0),
+         v4 = ifelse(group_ps >= "2012-07-19 01:00:00" & group_ps < "2012-07-20 01:00:00", 1, 0),
+         v5 = ifelse(group_ps >= "2012-07-20 01:00:00" & group_ps < "2012-10-22 01:00:00", 1, 0),
+         v6 = ifelse(group_ps >= "2012-10-22 01:00:00" & group_ps < "2013-08-01 01:00:00", 1, 0),
+         v7 = ifelse(group_ps >= "2013-08-01 01:00:00" & group_ps < "2013-02-06 00:00:00", 1, 0),
+         v8 = ifelse(group_ps >= "2013-02-06 00:00:00" & group_ps < "2013-04-30 00:00:00", 1, 0),
+         v9 = ifelse(group_ps >= "2013-04-30 00:00:00" & group_ps < "2013-05-31 00:00:00", 1, 0),
+         v10 = ifelse(group_ps >= "2013-05-31 00:00:00" & group_ps < "2013-09-27 00:00:00", 1, 0),
+         v11 = ifelse(group_ps >= "2013-09-27 00:00:00" & group_ps < "2015-09-28 00:00:00", 1, 0),
+         v12 = ifelse(group_ps >= "2015-09-28 00:00:00" & group_ps < "2016-04-15 00:00:00", 1, 0),
+         v13 = ifelse(group_ps >= "2016-04-15 00:00:00" & group_ps < "2016-07-28 00:00:00", 1, 0),
+         v14 = ifelse(group_ps >= "2016-07-28 00:00:00" & group_ps < "2016-08-18 00:00:00", 1, 0),
+         v15 = ifelse(group_ps >= "2016-08-18 00:00:00" & group_ps < "2016-09-23 00:00:00", 1, 0),
+         v16 = ifelse(group_ps >= "2016-09-23 00:00:00" & group_ps < "2017-02-01 00:00:00", 1, 0),
+         v17 = ifelse(group_ps >= "2017-02-01 00:00:00" & group_ps < "2018-09-28 00:00:00", 1, 0),
+         v18 = ifelse(group_ps >= "2018-09-28 00:00:00" & group_ps < "2019-03-27 00:00:00", 1, 0),
+         v19 = ifelse(group_ps >= "2019-03-27 00:00:00" & group_ps < "2019-04-15 00:00:00", 1, 0),
+         v20 = ifelse(group_ps >= "2019-04-15 00:00:00", 1, 0))
+
+
+df$group_ps <- as.numeric(df$group_ps)
+df$group_ps <- 0
+str(df$group_ps)
+df$group_ps[df$v1 == 1] <- 1
+
+df = df %>% replace(group_ps[v2 == 1], 2)
+
+df <- df %>% 
+  mutate(group_ps if v2 == 1, 2)
+
+df = df %>% 
+
+#Compiling the news_disp$ps_group
+news_disp$ps_group[news_disp$ps_group_1 == 1] <- 1
+news_disp$ps_group[news_disp$ps_group_2 == 1] <- 2
+news_disp$ps_group[news_disp$ps_group_3 == 1] <- 3
+news_disp$ps_group[news_disp$ps_group_4 == 1] <- 4
+news_disp$ps_group[news_disp$ps_group_5 == 1] <- 5
+news_disp$ps_group[news_disp$ps_group_6 == 1] <- 6
+news_disp$ps_group[news_disp$ps_group_7 == 1] <- 7
+news_disp$ps_group[news_disp$ps_group_8 == 1] <- 8
+news_disp$ps_group[news_disp$ps_group_9 == 1] <- 9
+news_disp$ps_group[news_disp$ps_group_10 == 1] <- 10
+news_disp$ps_group[news_disp$ps_group_11 == 1] <- 11
+news_disp$ps_group[news_disp$ps_group_12 == 1] <- 12
+news_disp$ps_group[news_disp$ps_group_13 == 1] <- 13
+news_disp$ps_group[news_disp$ps_group_14 == 1] <- 14
+news_disp$ps_group[news_disp$ps_group_15 == 1] <- 15
+news_disp$ps_group[news_disp$ps_group_16 == 1] <- 16
+news_disp$ps_group[news_disp$ps_group_17 == 1] <- 17
+news_disp$ps_group[news_disp$ps_group_18 == 1] <- 18
+news_disp$ps_group[news_disp$ps_group_19 == 1] <- 19
+news_disp$ps_group[news_disp$ps_group_20 == 1] <- 20

@@ -14,36 +14,41 @@ setwd("C:/Users/lse043/OneDrive - University of Bergen/Documents/0 PhD PROJECT/P
 df <- readRDS("dataframe_merged.rds")
 
 # loading all the dataframes (df_gw, text, df)
-#load("dataframes.RData")
+load("dataframes.RData")
 
 # making corpus ####
 
 library(quanteda)
-corp <- corpus(df, docid_field = 'id', text_field='text')
-dtm <- dfm(corp)
+#corp <- corpus(df, docid_field = 'id', text_field='text')
+corp <- corpus(df_gw, docid_field = 'text_id', text_field='text')
 
 # 1. Pre-processing texts and creating the DTM ####
-
+dtm <- dfm(corp)
 dtm
 #Document-feature matrix of: 394 documents, 12,031 features (97.9% sparse) and 7 docvars.
 
-head(docvars(dtm)) 
-tail(docvars(dtm)) 
+dtm_pp <- dfm(corp,
+               tolower = TRUE,
+               stem = TRUE,
+               remove = stopwords("english"),
+               remove_punct = TRUE,
+               remove_numbers = TRUE)
+dtm_pp 
+#Document-feature matrix of: 394 documents, 7,643 features (97.7% sparse) and 7 docvars.
 
-
-#### pre-processing here ####
+#inspecting
+head(docvars(dtm_pp)) 
+tail(docvars(dtm_pp)) 
+head(docvars(dtm_pp), 3)
 
 
 # ANALYZING (RNewsflow) #### 
 library(RNewsflow)
 
-dtm
-head(docvars(dtm), 3)
-
 # 2. Using word statistics to filter and weight the DTM ####
 
 #filter out words that are evenly used over time: 
-tdd <- term_day_dist(dtm)
+tdd <- term_day_dist(dtm_pp)
 tail(tdd, 3)
 head(tdd, 3)
 #days.entropy:  tells us whether the occurrence of a word over time is 
@@ -68,6 +73,13 @@ View(tdd)
 #give more weight to rare words than common words
 #classic weighting scheme and recommended standard: the term-frequency inverse document frequency (tf.idf)
 dtm2 <- quanteda::dfm_tfidf(dtm)
+dtm2_pp <- quanteda::dfm_tfidf(dtm_pp)
+
+# AONTHER POTENTIAL WAY OF TRIMMING (WIP)
+# trimming: want to remove the low frequency and idiosyncratic words:
+#vdfm <- dfm_trim(corpdfm, min_termfreq = 10, min_docfreq = 5)
+# min_termfreq / min_count = remove words used less than 10
+# min_docfreq = remove words used in less than 5 docs
 
 
 # 3. Calculating document similarities ####
@@ -81,34 +93,45 @@ g2 <- newsflow_compare(dtm2, date_var='date',
                       hour_window = c(0,744),  #need to alter window
                       min_similarity = 0.2)  # in model, set to 0.4
 
+g2_pp <- newsflow_compare(dtm2_pp, date_var='date',
+                       hour_window = c(0,744), 
+                       min_similarity = 0.4)
+
+
 #inspecting document (vertices) and document pairs (edges) and attributes: 
 
 V(g)$source_type
 E(g)$hourdiff
 
-vertex_sourcetype = V(g)$source_type
-edge_hourdiff = E(g)$hourdiff
+V(g2_pp)$source_type
+E(g2_pp)$hourdiff
 
-head(vertex_sourcetype)
-head(edge_hourdiff)
+vertex_sourcetype2_pp = V(g2_pp)$source_type
+edge_hourdiff2_pp = E(g2_pp)$hourdiff
 
-vertex_date = V(g)$date
-head(vertex_date)
+head(vertex_sourcetype2_pp)
+head(edge_hourdiff2_pp)
+
+vertex_date2_pp = V(g2_pp)$date
+head(vertex_date2_pp)
 
 # as dataframe: 
+v2_pp <- as_data_frame(g2_pp, 'vertices')
+e2_pp <- as_data_frame(g2_pp, 'edges')
 
-v <- as_data_frame(g2, 'vertices')
-e <- as_data_frame(g2, 'edges')
-
-head(v[,c('name','date','source','source_type')],3)
-head(e,3) # weight represents the similarity score
+head(v2_pp[,c('name','date','source','source_type')],3)
+head(e2_pp,3) # weight represents the similarity score
 
 # plotting histogram:
 hist(E(g)$hourdiff, main='Time distance of document pairs', 
      xlab = 'Time difference in hours', breaks = 150, right=F)
 
 #looks much better (with the weighting above): 
-hist(E(g2)$hourdiff, main='Time distance of document pairs', 
+hist(E(g2)$hourdiff, main='Time distance of document pairs (weighted)', 
+     xlab = 'Time difference in hours', breaks = 150, right=F)
+
+# weihted and pre-processed
+hist(E(g2_pp)$hourdiff, main='Time distance of document pairs (weighted+pp)', 
      xlab = 'Time difference in hours', breaks = 150, right=F)
 
 # saving with 1000 x 550 
