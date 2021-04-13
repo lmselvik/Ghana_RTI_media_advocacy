@@ -27,6 +27,13 @@ dtm <- dfm(corp)
 dtm
 #Document-feature matrix of: 394 documents, 12,031 features (97.9% sparse) and 7 docvars.
 
+dtm_p <- dfm(corp,
+              tolower = TRUE,
+              stem = TRUE,
+              remove_punct = TRUE,
+              remove_numbers = TRUE)
+
+#full pre-process: 
 dtm_pp <- dfm(corp,
                tolower = TRUE,
                stem = TRUE,
@@ -97,6 +104,9 @@ g2_pp <- newsflow_compare(dtm2_pp, date_var='date',
                        hour_window = c(0,744), 
                        min_similarity = 0.4)
 
+g_p <- newsflow_compare(dtm_p, date_var='date',
+                          hour_window = c(0,744), 
+                          min_similarity = 0.4)
 
 #inspecting document (vertices) and document pairs (edges) and attributes: 
 
@@ -119,8 +129,12 @@ head(vertex_date2_pp)
 v2_pp <- as_data_frame(g2_pp, 'vertices')
 e2_pp <- as_data_frame(g2_pp, 'edges')
 
+v_p <- as_data_frame(g_p, 'vertices')
+e_p <- as_data_frame(g_p, 'edges')
+
 head(v2_pp[,c('name','date','source','source_type')],3)
 head(e2_pp,3) # weight represents the similarity score
+
 
 # plotting histogram:
 hist(E(g)$hourdiff, main='Time distance of document pairs', 
@@ -136,7 +150,9 @@ hist(E(g2_pp)$hourdiff, main='Time distance of document pairs (weighted+pp)',
 
 # saving with 1000 x 550 
 
-
+# weihted and pre-processed
+hist(E(g_p)$hourdiff, main='Time distance of document pairs (weighted+pp)', 
+     xlab = 'Time difference in hours', breaks = 150, right=F)
 
 ## demo =========================
 dtm_rn = rnewsflow_dfm ## copy the demo data --- NB !
