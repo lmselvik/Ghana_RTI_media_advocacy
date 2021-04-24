@@ -597,6 +597,7 @@ df_5 <- df_3 %>%
   filter(ps_id %in% c(1,3,8,9,11,14,15,16,18))
 
 # Plot
+df_3$ps_id <- as.factor(df_3$ps_id)
 df_4$ps_id <- as.factor(df_4$ps_id)
 df_5$ps_id <- as.factor(df_5$ps_id)
 
@@ -617,11 +618,27 @@ p <- ggplot(df_5, aes(x=disp_days, y=weight, group=ps_id_label)) +
   labs(fill = "")+
   facet_wrap(~ps_id_label)
 
-
 p + theme(legend.title = element_blank(), text = element_text(size=20, family="serif")) 
 
 # saving: 1700 x 1100 = jpg
 # saving: 1100 x 700 = jpg
+
+# APPENDIX PLOT for submission ####
+pp <- ggplot(df_3, aes(x=disp_days, y=weight, group=ps_id_label)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth( , se = F, colour = "#7570B3") +
+  theme_bw()+
+  ylim(0, 1)+
+  xlab("Time since issuing of press statement (in days)")+
+  ylab("News stories' similarity with preceding press statement")+
+  labs(fill = "")+
+  facet_wrap(~ps_id_label)
+
+
+pp + theme(legend.title = element_blank(), text = element_text(size=20, family="serif")) 
+
+# saving: 1450 x 850 = jpg
+
 
 # INCLUDE IN PLOTS
 # WIP: more "air" around the plot and legends
