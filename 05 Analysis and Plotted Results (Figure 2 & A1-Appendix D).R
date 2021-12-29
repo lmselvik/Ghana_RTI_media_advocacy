@@ -67,6 +67,7 @@ tail(docvars(dtm_10), 3)
 
 # 2. COMPARE AND CALCULATE TEXTUAL SIMILARITIES #### 
 library(RNewsflow)
+library(dplyr)
 
 # calculating document similarities
 # and extracting relevant info:

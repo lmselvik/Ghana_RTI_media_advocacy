@@ -14,11 +14,11 @@ setwd("C:/Users/lse043/OneDrive - University of Bergen/Documents/0 PhD PROJECT/P
 
 ## a. News stories ####
 # reading news stories from web scraping finalised 19 June 2020
-gw_374 <- readRDS("GhanaWeb_374_(190620).rds")
+gw_374 <- readRDS("Data/GhanaWeb_374_(190620).rds")
 
 ## b. Press statements ####
 # loading texts read from jpg and pdf files
-text <- readRDS("RTI_20_press_statements.rds")
+text <- readRDS("Data/RTI_20_press_statements.rds")
 
 
 # 2. PREPARING DATAFRAMES ####
@@ -217,7 +217,7 @@ df_final <-
 
 # 4. SAVING DATAFRAMES ####
 
-# saving datafrmaes
+# saving dataframes
 ## save(df_gw, text, df, file = "Data/dataframes.RData")
 # loading: 
 #load("Data/dataframes.RData")

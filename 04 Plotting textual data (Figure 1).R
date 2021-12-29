@@ -68,13 +68,13 @@ df_news_ps <- left_join(df_news_ps, count_df, by = c("date"))
 glimpse(df_news_ps)
 
 # saving 
-##saveRDS(df_news_ps, file = "Data/df_plot_news dispersion")
+##saveRDS(df_news_ps, file = "Data/df_plot_news_dispersion")
 
 
 # 4. PLOTTING FIGURE 1   ####
 
 # loading dataframe
-df_news_ps <- readRDS("Data/df_plot_news dispersion")
+df_news_ps <- readRDS("Data/df_plot_news_dispersion")
 
 # packages: 
 library(ggplot2)
